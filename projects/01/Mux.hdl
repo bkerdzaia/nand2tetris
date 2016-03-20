@@ -20,5 +20,4 @@ CHIP Mux {
 	And(a = a, b = notSel, out = andaNotSel);
 	And(a = sel, b = b, out = andbSel);
 	Or(a = andaNotSel, b = andbSel, out = out);
-	
 }
