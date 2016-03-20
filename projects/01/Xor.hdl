@@ -16,7 +16,7 @@ CHIP Xor {
 	// Nand(Nand(a, Not(b)), Nand(Not(a), b))
 	
 	Not(in = a, out = nota);
-	Not(in = b, out = notb);
+	Not(in = b, out = notb); 
 	
 	Nand(a = a, b = notb, out = nandaNotb);
 	Nand(a = nota, b = b, out = nandbNota);
