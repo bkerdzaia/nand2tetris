@@ -14,7 +14,7 @@ CHIP Not16 {
 
     PARTS:
 	Not(in = in[0], out = out[0]);
-	Not(in = in[1], out = out[1]);
+	Not(in = in[1], out = out[1]); 
 	Not(in = in[2], out = out[2]);
 	Not(in = in[3], out = out[3]);
 	Not(in = in[4], out = out[4]);
