@@ -1,0 +1,23 @@
+/ This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ALU.hdl
+
+/**
+ * Checks if a is zero or negative
+ * if (a == 0) set zr = 1
+ * if (a < 0) set ng = 1
+ */
+
+CHIP Sign {
+	IN a[16];
+	OUT zr, ng;
+	
+	PARTS:
+	Or8Way(in = a[0..7], out = or07);
+	Or8Way(in = a[8..15], out = or815);
+	Or(a = or07, b = or815, out = or015);
+	Not(in = or015, out = zr); 
+	
+	And(a = a[15], b = true, out = ng);
+}
