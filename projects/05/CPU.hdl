@@ -39,5 +39,37 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+	Mux16(a=instruction,b=aluOutput,sel=instruction[15],out=toARegister);
+	
+	Not(in=instruction[5],out=notd1);
+	Nand(a=instruction[15],b=notd1,out=aRegisterLoader);
+	ARegister(in=toARegister,load=aRegisterLoader,out=aRegister,out[0..14]=addressM,out=toPC); 
+	
+	Mux16(a=aRegister,b=inM,sel=instruction[12],out=amRegister); 
+	
+	ALU(x=dRegister,y=amRegister,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=aluOutput,out=outM,out=dDest,zr=zero,ng=neg); 
+	
+	And(a=instruction[4],b=instruction[15],out=dRegisterLoader); 
+	DRegister(in=dDest,load=dRegisterLoader,out=dRegister);
+	
+	
+	Or(a=zero, b=neg, out=zeroOrNeg);
+	Not(in=zeroOrNeg, out=pos);
+	
+	And(a=instruction[2], b=instruction[15], out=j1Loader);
+	And(a=instruction[1], b=instruction[15], out=j2Loader);
+	And(a=instruction[0], b=instruction[15], out=j3Loader);
+	
+	And(a=neg, b=j1Loader, out=andNegJ1Loader);
+	And(a=zero, b=j2Loader, out=andNegJ2Loader);
+	And(a=pos, b=j3Loader, out=andNegJ3Loader);
+	
+	Or(a=andNegJ1Loader, b=andNegJ2Loader, out=orNegJ1J2Loader);
+	Or(a=orNegJ1J2Loader, b=andNegJ3Loader, out=pcLoader);
+	
+	Not(in=pcLoader, out=pcInc);
+	
+	PC(in=toPC,load=pcLoader,inc=pcInc,reset=reset,out[0..14]=pc); 
+	
+	And(a=instruction[3],b=instruction[15],out=writeM); 
 }
