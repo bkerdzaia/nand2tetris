@@ -103,5 +103,3 @@ class Parser:
         Should be called only when commandType() is C_COMMAND.
         """
         return self.__jump
-
-
