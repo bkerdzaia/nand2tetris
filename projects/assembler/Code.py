@@ -101,3 +101,4 @@ class Code:
         elif mnemonic == "JMP":
             return "111"
         return None
+ 
