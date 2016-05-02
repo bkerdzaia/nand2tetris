@@ -81,7 +81,9 @@ def main(fileName):
     lines = 1
     while parser.hasMoreCommands():
         parser.advance()
-        if parser.commandType() == parser.A_COMMAND:
+        if parser.commandType() == parser.ERROR_COMMAND:
+            raise Exception("at line: " + str(lines) +" expression expected")
+        elif parser.commandType() == parser.A_COMMAND:
             checkForNull(parser.symbol(), "in line " + str(lines) + " expression expected")
             writeString, currentMemoryLocation = constructAInstruction(parser.symbol(), symbolTable, currentMemoryLocation)
             toWriteContent += writeString+'\n'
