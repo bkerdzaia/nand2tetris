@@ -18,6 +18,7 @@ class Parser:
     A_COMMAND = 1
     C_COMMAND = 2
     L_COMMAND = 3
+    ERROR_COMMAND = 4
 
     def __init__(self, file):
         """  Opens the input file/stream and gets ready to parse it. """
@@ -50,6 +51,8 @@ class Parser:
             return None
         self.__symbol, self.__comp, self.__dest, self.__jump = None, None, None, None
         command = self.__current.strip()
+        if len(command) == 0:
+            return None
         commentStartIndex = command.find("//")
         if commentStartIndex == 0:
             return None
@@ -73,7 +76,7 @@ class Parser:
         if command.startswith("(") and command.endswith(")"):
             self.__symbol = command[1:len(command)-1]
             return self.L_COMMAND
-        return None
+        return  self.ERROR_COMMAND
 
     def symbol(self):
         """
