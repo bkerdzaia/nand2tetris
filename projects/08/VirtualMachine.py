@@ -56,11 +56,9 @@ def generate_assembly_code(path):
 
 # main program, generates assembly code.
 if __name__ == '__main__':
-    # if len(sys.argv) != 2:
-    #     raise Exception("Not valid argument number")
-    # try:
-        # generate_assembly_code(sys.argv[1])
-        # generate_assembly_code('D:\\nand2tetris\projects\\08\FunctionCalls\\NestedCall\Sys.vm')
-        generate_assembly_code('Pong')
-    # except Exception as e:
-    #     print(e)
+    if len(sys.argv) != 2:
+        raise Exception("Not valid argument number")
+    try:
+        generate_assembly_code(sys.argv[1])
+    except Exception as e:
+        print(e)
