@@ -117,9 +117,6 @@ class CodeWriter:
             offset = self.__pointers_offsets.get(segment)
             if offset is None:
                 raise Exception("Not valid segment - " + segment)
-            # self.__stream.write("@" + str(offset) + "\n" + "D=M\n" + "@" + str(index) + "\n" +
-            #                     "D=D+A\n" + "@my$_$variable\n" + "M=D\n" + self.__decrement_SP() + "D=M\n" +
-            #                     "@my$_$variable\n" + "A=M\n" + "M=D\n")
             self.__stream.write("@" + str(offset) + "\n" + "D=M\n" + "@" + str(index) + "\n" +
                                 "D=D+A\n" + "@R13\n" + "M=D\n" + self.__decrement_SP() + "D=M\n" +
                                 "@R13\n" + "A=M\n" + "M=D\n")
