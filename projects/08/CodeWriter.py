@@ -16,11 +16,11 @@ class CodeWriter:
         self.__stream = open(file_name, "w")
         self.__vm_file_name = None
         self.__function_name = None
-        self.__add_suffix_recursive_function = ""
+        self.__call_nums = 0
         self.__label_index = 0
         self.__binary_arithmetic_commands = {"add": "+", "sub": "-", "and": "&", "or": "|"}
         self.__unary_arithmetic_commands = {"neg": "-", "not": "!"}
-        self.__comparative_commands = {"lt": "JLT", "gt": "JGT", "eq": "JEQ"}
+        self.__comparative_commands = {"lt": "JLT", "gt": "JGE", "eq": "JEQ"}
         self.__segment_offsets = {"pointer": 3, "temp": 5}
         self.__pointers_offsets = {"this": 3, "local": 1, "argument": 2, "that": 4}
 
@@ -45,14 +45,15 @@ class CodeWriter:
     def __pop_two_items():
         return CodeWriter.__decrement_SP() + "D=M\n" + CodeWriter.__decrement_SP()
 
-    # creates a label and writes boolean value in the stack where sp points to and jumps to CONTINUE label
-    def __write_boolean_value(self, value):
-        return "(" + self.__change_label("WRITE") + str(value) + ")\n" + "@SP\n" + "A=M\n" + \
-               "M=" + str(value) + "\n" + "@" + self.__change_label("CONTINUE") + "\n" + "0;JMP\n"
+    # writes given boolean value in stack where sp points, increments sp
+    # and is jumped on the address where R14 register points
+    def __write_boolean(self, value):
+        self.__stream.write("(WRITE_" + str(value) + ")\n" + "@SP\n" + "AM=M+1\n" + "A=A-1\n" +
+                            "M=" + str(value) + "\n" + "@R14\n" + "A=M\n" + "0;JMP\n")
 
-    # make all labels unique
-    def __change_label(self, name):
-        return name + str(self.__label_index) + "."
+    # return unique continue label
+    def __continue_label(self):
+        return "CONTINUE_" + str(self.__label_index)
 
     def write_arithmetic(self, command):
         """ Writes the assembly code that is the translation of the given arithmetic command. """
@@ -67,11 +68,9 @@ class CodeWriter:
             return
         command_type = self.__comparative_commands.get(command)
         if command_type is not None:
-            self.__stream.write(self.__pop_two_items() + "D=M-D\n" + "@" + self.__change_label("WRITE") +
-                                str(self.__TRUE) + "\n" + "D;" + command_type + "\n" + "@" +
-                                self.__change_label("WRITE") + str(self.__FALSE) + "\n" + "0;JMP\n" +
-                                self.__write_boolean_value(self.__FALSE) + self.__write_boolean_value(self.__TRUE) +
-                                "(" + self.__change_label("CONTINUE") + ")\n" + self.__increment_SP())
+            self.__stream.write(self.__write_register(self.__continue_label(), "R14") + self.__pop_two_items() +
+                                "D=M-D\n" + "@WRITE_-1\n" + "D;" + command_type + "\n" + "@WRITE_0\n" + "0;JMP\n"
+                                "(" + self.__continue_label() + ")\n")
             self.__label_index += 1
             return
         raise Exception("Not valid arithmetic command: " + command)
@@ -133,7 +132,8 @@ class CodeWriter:
         self.__stream.write("@Sys.init\n" + "0;JMP\n")
         # add loop
         self.__write_loop()
-        pass
+        self.__write_boolean(self.__TRUE)
+        self.__write_boolean(self.__FALSE)
 
     # generate unique symbol for function's labels
     def __to_label(self, label):
@@ -152,13 +152,13 @@ class CodeWriter:
         self.__stream.write(self.__decrement_SP() + "D=M\n" + "@" + self.__to_label(label) + "\n" + "D;JNE\n")
 
     # returns the unique label for given function to use as return address label
-    def __return_address(self, function_name):
-        return function_name + "_RETURN_ADDRESS" + self.__add_suffix_recursive_function
+    def __return_address(self):
+        return "RET_ADDRESS_CALL" + str(self.__call_nums)
 
     def write_call(self, function_name, num_args):
         """ Writes assembly code that effects the call command. """
         # push return-address
-        self.__stream.write("@" + self.__return_address(function_name) + "\n" + "D=A\n" + self.__push())
+        self.__stream.write("@" + self.__return_address() + "\n" + "D=A\n" + self.__push())
         # push LCL
         self.__stream.write("@LCL\n" + "D=M\n" + self.__push())
         # push ARG
@@ -174,8 +174,8 @@ class CodeWriter:
         # goto function_name
         self.__stream.write("@" + function_name + "\n" + "0;JMP\n")
         # label (return-address)
-        self.__stream.write("(" + self.__return_address(function_name) + ")\n")
-        self.__add_suffix_recursive_function += "$"
+        self.__stream.write("(" + self.__return_address() + ")\n")
+        self.__call_nums += 1
 
     # M[destValue] = *(frame - number)
     @staticmethod
@@ -225,9 +225,10 @@ class CodeWriter:
         self.__function_name = function_name
         self.__stream.write("(" + function_name + ")\n")
         # repeat num_locals times: PUSH 0
-        self.__stream.write(self.__write_register(self.__jump_from_loop_label(), "R15") +
-                            self.__write_register(str(num_locals), "R14") +
-                            "@CYCLE_START\n" + "0;JMP\n" + "(" + self.__jump_from_loop_label() + ")\n")
+        if int(num_locals) != 0:
+            self.__stream.write(self.__write_register(self.__jump_from_loop_label(), "R15") +
+                                self.__write_register(str(num_locals), "R14") +
+                                "@CYCLE_START\n" + "0;JMP\n" + "(" + self.__jump_from_loop_label() + ")\n")
 
     def close(self):
         """ Closes the output file. """
