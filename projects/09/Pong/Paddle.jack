@@ -1,0 +1,74 @@
+
+class Paddle {
+
+	field int x, y; // coordinates of paddle
+	field int width, height; // dimenstions of paddle
+
+    /** Constructs a new Paddle with a given location, width and height. */
+	constructor Paddle new( int startX, int startY, int paddleWidth, int paddleHeight ) {
+		let x = startX;
+		let y = startY;
+		let width = paddleWidth;
+		let height = paddleHeight;
+		do draw();
+		return this;
+	}
+	
+	/** Draws the Paddle on the screen. */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + width, y + height);
+        return;
+    }
+	
+	/** Deallocates the object's memory. */
+	method void dispose() {
+		do Memory.deAlloc(this);
+        return;
+    }
+
+	/** Moves up by 2 pixels. */
+    method void moveUp() {
+        if (y > 1) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, (y + height) - 1, x + width, y + height);
+            let y = y - 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, y, x + width, y + 1);
+        }
+        return;
+    }
+
+    /** Moves down by 2 pixels. */
+    method void moveDown() {
+        if ((y + height) < 254) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(x, y, x + width, y + 1);
+            let y = y + 2;
+            do Screen.setColor(true);
+            do Screen.drawRectangle(x, (y + height) - 1, x + width, y + height);
+        }
+        return;
+    }
+	
+	/** returns the x coordinate of paddle */
+	method int getX() {
+		return x;
+	}
+	
+	/** returns the y coordinate of paddle */
+	method int getY() {
+		return y;
+	}
+	
+	/** returns the width of paddle */
+	method int getWidth() {
+		return width;
+	}
+	
+	/** returns the height of paddle */
+	method int getHeight() {
+		return height;
+	}
+	
+}
