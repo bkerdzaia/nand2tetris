@@ -1,0 +1,67 @@
+/**
+ * Implements a graphic Ball. A graphic Ball has a screen location
+ * and a size. It also has methods for drawing, erasing, moving on the 
+ * screen, and changing its size.
+ */
+class Ball {
+
+    // Location on the screen
+    field int x, y;
+
+    // The size of the Ball
+    field int size;
+
+    /** Constructs a new Ball with a given location and size. */
+    constructor Ball new( int Ax, int Ay, int Asize) {
+        let x = Ax;
+        let y = Ay;
+        let size = Asize;
+        do draw();
+        return this;
+    }
+
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    /** Draws the Ball on the screen. */
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+
+    /** Erases the Ball from the screen. */
+    method void erase() {
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + size, y + size);
+        return;
+    }
+    
+	/** moves the ball with given direction */
+	method void moveDirection( int dx, int dy) {
+		do erase();
+		let x = x + dx;
+		let y = y + dy;
+		do draw();
+		return;
+	}
+	
+	/** returns the x coordinate of ball */
+	method int getX() {
+		return x;
+	}
+	
+	/** returns the y coordinate of ball */
+	method int getY() {
+		return y;
+	}
+	
+	/** returns the size of ball */
+	method int getSize() {
+		return size;
+	}
+	
+}
