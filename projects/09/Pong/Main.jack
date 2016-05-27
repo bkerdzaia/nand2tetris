@@ -1,0 +1,86 @@
+
+class Main {
+
+	/**
+	 * main program that prints the instruction, starts playing 
+	 * pong while user wants playing.
+	 */
+	function void main() {
+		var PongGame game;
+		var String firstPlayer, secondPlayer;
+		var int winner;
+		var boolean play;
+		do Output.printString("Pong is one of the first computer games that ever created, this simple ");
+		do Output.printChar(String.doubleQuote());
+		do Output.printString("tennis like"); 
+		do Output.printChar(String.doubleQuote());
+		do Output.printString("game features two paddles and a ball, the goal is to defeat your opponent by being the first one to gain a point, a player gets a point once the opponent misses a ball. The game can be played with two human players. ");
+		do Output.println();
+		do Output.printString("Press 'w' and 's' to move left paddle up and down");
+		do Output.println();
+		do Output.printString("Press 'arrow up' and 'arrow down' to move right paddle up and down");
+		do Output.println();
+		do Output.printString("Press 'q' to halt program");
+		do Output.println();
+		let firstPlayer = Main.getFirstPlayerName();
+		let secondPlayer = Main.getSecondPlayerName();
+		let play = true;
+		while (play) {
+			do Screen.clearScreen();
+			let game = PongGame.new();
+			do game.start();
+			let winner = game.getWinner();
+			do game.dispose();
+			do Screen.clearScreen();
+			do Output.moveCursor(0, 0);
+			do Main.printWinner(winner, firstPlayer, secondPlayer);
+			do Output.println();
+			let play = Main.playAgain();
+		}
+		return;
+	}
+	
+	/** returns boolean value if player wants to play again */
+	function boolean playAgain() {
+		var String ans;
+		let ans = Keyboard.readLine("Do you want to play again(please press enter if you don't want): ");
+		do Output.printString(ans);
+		if (ans.length() = 0) {
+			return false;
+		}
+		return true;
+	}
+	
+	/** prints the name of winner */
+	function void printWinner( int winner, String firstPlayer, String secondPlayer ) {
+		if (winner = 1) {
+			do Output.printString("Winner is ");
+			do Output.printString(firstPlayer);
+		} else {
+			do Output.printString("Winner is ");
+			do Output.printString(secondPlayer);
+		}
+		return;
+	}
+	
+	/** returns the name of first player, which is default Player1 */
+	function String getFirstPlayerName() {
+		var String player;
+		let player = Keyboard.readLine("Enter first player name(default is Player1): ");
+		if (player.length() = 0) {
+			let player = "Player1";
+		}
+		return player;
+	}
+	
+	/** returns the name of second player, which is default Player2 */
+	function String getSecondPlayerName() {
+		var String player;
+		let player = Keyboard.readLine("Enter first player name(default is Player2): ");
+		if (player.length() = 0) {
+			let player = "Player2";
+		}
+		return player;
+	}
+
+}
