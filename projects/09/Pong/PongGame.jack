@@ -1,0 +1,134 @@
+
+class PongGame {
+	
+	field Paddle pad1, pad2;
+	field boolean pad1Direction; // true if up, false - down
+	field boolean pad2Direction; // true if up, false - down
+	field Ball ball;
+	field int dx, dy;
+	field int winner;
+	field boolean exit;
+
+	/** Creates two paddles and a ball */
+	constructor PongGame new() {
+		var int x, y, width, height;
+		var int ballSize;
+		let width = 10;
+		let height = 70;
+		let x = 5;
+		let y = (256 - height) / 2;
+		let pad1 = Paddle.new(x, y, width, height);
+		let pad2 = Paddle.new(512-x-width, y, width, height);
+		let ballSize = 4;
+		let ball = Ball.new((512 - ballSize) / 2, (256 - ballSize) / 2, ballSize);
+		let dx = -1;
+		let dy = -1;
+        return this;
+    }
+	
+	/** starts the game */
+	method void start() {
+        var char key;
+		let exit = false;
+		while (~exit) {
+            // waits for a key to be pressed.
+			while ((key = 0) & ~exit) {
+                let key = Keyboard.keyPressed();
+				do move();
+            }
+			do paddleDirection(key);
+			// waits for the key to be released.
+			while (~(key = 0) & ~exit) {
+				let key = Keyboard.keyPressed();
+				do move();
+			}
+		}
+		return;
+	}
+	
+	/** moves the paddles or exits the program for given key. */
+	method void paddleDirection( char key ) {
+		if (key = 131) {
+			let pad2Direction = true;
+		}
+		if (key = 133) {
+			let pad2Direction = false;
+		}
+		if (key = 87) {
+			let pad1Direction = true;
+		}
+		if (key = 83) {
+			let pad1Direction = false;
+		}
+		if (key = 81) {
+			let exit = true;
+		}
+		return;
+	}
+
+	/** moves the paddles and ball in current direction */
+	method void move() {
+		if (pad1Direction) {
+			do pad1.moveUp();
+		} else {
+			do pad1.moveDown();
+		}
+		
+		if (pad2Direction) {
+			do pad2.moveUp();
+		} else {
+			do pad2.moveDown();
+		}
+		do moveBall();
+        do Sys.wait(10); // Delays the next movement.
+		return;
+	}
+	
+	/** moves a ball */
+	method void moveBall() {
+		if (~(512 - ball.getSize() - Math.abs(dx) > ball.getX())) {
+			let winner = 1;
+			let exit = true;
+			return;
+		}
+		if (~(0 < ball.getX())) {
+			let winner = 2;
+			let exit = true;
+			return;
+		}
+		if (~(256 - ball.getSize() - Math.abs(dy) > ball.getY())) {
+			let dy = -dy;
+		}
+		if (~(0 < ball.getY())) {
+			let dy = -dy;
+		}
+		if (~((ball.getX()) > (pad1.getX() + pad1.getWidth())) & ballInPaddle(ball, pad1)) {
+			let dx = -dx;
+		}
+		if (~((ball.getX() + ball.getSize() - Math.abs(dx)) < pad2.getX()) & ballInPaddle(ball, pad2)) {
+			let dx = -dx;
+		}
+		do ball.moveDirection(dx, dy);
+		return;
+	}
+	
+	/** checks if ball is between paddle pad for y coordinate */
+	method boolean ballInPaddle(Ball ball, Paddle pad){
+		return (~(pad.getY() > (ball.getY() + ball.getSize())) & ~((pad.getY() + pad.getHeight()) < ball.getY()));
+	}
+	
+	/** returns the winner index, 1 for left paddle and 2 for right one. */
+	method int getWinner() {
+		return winner;
+	}
+	
+    /** Deallocates the object's memory. */
+    method void dispose() {
+        do pad1.dispose();
+        do pad2.dispose();
+		do ball.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+
+}
