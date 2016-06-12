@@ -1,4 +1,6 @@
+#!/usr/bin/evn python3
 import re
+
 
 class JackTokenizer:
     """
@@ -58,6 +60,19 @@ class JackTokenizer:
         """
         self.__current_token = self.__tokens[self.__token_index]
         self.__token_index += 1
+
+    def has_previous_token(self):
+        """ Do we have previous tokens in the input? """
+        return self.__token_index >= 0
+
+    def back(self):
+        """
+        Gets the previous token from the input and makes it the current token. This
+        method should only be called if has_previous_token() is true. Initially
+        there is no current token.
+        """
+        self.__token_index -= 1
+        self.__current_token = self.__tokens[self.__token_index]
 
     def token_type(self):
         """ :return: Returns the type of the current token. """
