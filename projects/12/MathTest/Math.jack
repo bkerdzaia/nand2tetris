@@ -1,0 +1,138 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Math.jack
+
+/**
+ * A basic math library.
+ */
+class Math {
+
+	static Array twoToThe;
+
+    /** Initializes the library. */
+    function void init() {
+		var int j, powToJ;
+		
+		let twoToThe = Array.new(16);
+		let j = 0;
+		let powToJ = 1;
+		while (j < 16) {
+			let twoToThe[j] = powToJ; // 2^j;
+			let j = j + 1;
+			let powToJ = powToJ + powToJ;  // powToJ * 2 
+		}
+		return;
+    }
+	
+	function boolean bit(int x, int j) {
+		return ~((x & twoToThe[j]) = 0);
+	}
+
+    /** Returns the absolute value of x. */
+    function int abs(int x) {
+		if (x < 0) {
+			return -x;
+		}
+		return x;
+    }
+
+    /** Returns the product of x and y. */
+    function int multiply(int x, int y) {
+		var int sum, shiftedX, j;
+		var boolean sign;
+		
+		if (x < 0) {
+			let sign = ~sign;
+			let x = -x;
+		}
+		if (y < 0) {
+			let sign = ~sign;
+			let y = -y;
+		}		
+		let sum = 0;
+		let shiftedX = x;
+		let j = 0;
+		while (j < 16) {
+			if (Math.bit(y, j)) {
+				let sum = sum + shiftedX;
+			}
+			let shiftedX = shiftedX + shiftedX;
+			let j = j + 1;
+		}
+		if (sign) {
+			let sum = -sum;
+		}
+		return sum;
+    }
+
+    /** Returns the integer part of x/y. */
+    function int divide(int x, int y) {
+		var int q;
+		var int result;
+		var boolean sign;
+		
+		let sign = false;
+		if (x < 0) {
+			let sign = ~sign;
+			let x = -x;
+		}
+		if (y < 0) {
+			let sign = ~sign;
+			let y = -y;
+		}		
+		if (y > x) {
+			return 0;
+		}
+		if (y*2 < 0) { // overflow
+			let q = 0;
+		} else {
+			let q = Math.divide(x, y*2);
+		}
+		if ((x - (2*y*q)) < y) {
+			let result = 2*q;
+		} else {
+			let result = (2*q) + 1;
+		}
+		if (sign) {
+			let result = -result;
+		}		
+		return result;
+    }
+
+    /** Returns the integer part of the square root of x. */
+    function int sqrt(int x) {
+		var int y, j, sq;
+		
+		if (x < 0) {
+			return -1;
+		}		
+		let y = 0;
+		let j = 7;
+		while (~(j < 0)) {
+			let sq = y + twoToThe[j];
+			if ((~((sq*sq) > x)) & ((sq*sq) > 0)) {
+				let y = sq;
+			}
+			let j = j - 1;
+		}
+	
+		return y;
+    }
+
+    /** Returns the greater number. */
+    function int max(int a, int b) {
+		if (a > b) {
+			return a;
+		}
+		return b;
+    }
+
+    /** Returns the smaller number. */
+    function int min(int a, int b) {
+		if (a < b) {
+			return a;
+		}
+		return b;
+    }
+}
